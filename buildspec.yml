@@ -7,11 +7,8 @@ phases:
     commands:
       - curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
       - export NVM_DIR="$HOME/.nvm"
-      - '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"'
-      - nvm install 18.20.2
-      - echo installed node 18.20.2
-      - nvm use 18.20.2 
-      - echo using node 18.20.2
+      - bash -c 'source "$NVM_DIR/nvm.sh" && nvm install 18.20.2 && nvm use 18.20.2'
+      - echo "Installed and using Node.js version 18.20.2"
     
       - echo Installing source dependencies...
       - yarn install
