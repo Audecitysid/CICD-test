@@ -1,0 +1,164 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                 Int        @id @default(autoincrement())
+  username           String?
+  email              String
+  password           String?
+  preSelectPkg       String?
+  preLifeTimePkg     Boolean?   @default(false)
+  verifyCode         String?
+  Plan               Plan[]
+  History            History[]
+  Graph              Graph[]
+  Like               Like[]
+  Category           Category[]
+  Trends             Trend[]
+  subscriptionStatus Boolean    @default(false)
+  Role               Role       @default(USER)
+  verified           Boolean    @default(false)
+  deleted            Boolean    @default(false)
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @default(now())
+}
+
+model Plan {
+  id                      Int       @id @default(autoincrement())
+  priceId                 String
+  status                  Boolean   @default(true)
+  lifeTime                Boolean   @default(false)
+  subscribed              Boolean   @default(true)
+  sessionId               String
+  billingPeriod           String?
+  productName             String
+  customerId              String?
+  currency                String
+  totalSearches           Int?
+  timestampCreated        Int
+  canceled_at             Int?
+  totalSearchesRemainings Int?
+  searchesAlloted         Int
+  allotedSearchRemainings Int
+  amountPaid              String?
+  User                    User?     @relation(fields: [userId], references: [id])
+  userId                  Int?
+  createdAt               DateTime
+  updatedAt               DateTime
+  expiresAt               DateTime?
+}
+
+model History {
+  id            Int      @id @default(autoincrement())
+  searchKeyword String
+  description   String?
+  goal          String?
+  aiStrength    String?
+  region        String?
+  Graph         Graph[]
+  User          User     @relation(fields: [userId], references: [id])
+  userId        Int
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @default(now())
+}
+
+model Graph {
+  id              Int             @id @default(autoincrement())
+  keyword         String
+  competition     String?
+  pinned          Boolean?        @default(false)
+  cpc             String?
+  volumeGrowth    Float?
+  tagName         String?
+  aiStrength      String?
+  addedAtTd       DateTime?
+  searchVolume    Int?
+  trending        Boolean         @default(false)
+  trendDb         Boolean         @default(false)
+  Like            Like[]
+  User            User            @relation(fields: [userId], references: [id])
+  History         History         @relation(fields: [historyId], references: [id])
+  userId          Int
+  historyId       Int
+  MonthlySearches MonthlySearch[]
+  SubCategory     SubCategory[]
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @default(now())
+}
+
+model Like {
+  id        Int      @id @default(autoincrement())
+  User      User     @relation(fields: [userId], references: [id])
+  Graph     Graph    @relation(fields: [graphId], references: [id])
+  userId    Int
+  graphId   Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
+
+model MonthlySearch {
+  id           Int      @id @default(autoincrement())
+  year         Int
+  month        Int
+  trending     Boolean  @default(false)
+  searchVolume String?
+  Graph        Graph    @relation(fields: [graphId], references: [id])
+  graphId      Int
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now())
+}
+
+// growth        Float
+// Growth        String?
+
+model Trend {
+  id             Int         @id @default(autoincrement())
+  keyword        String
+  volumeIndex    Int?
+  growth         String
+  growthInNumber Float?
+  Category       Category    @relation(fields: [categoryId], references: [id])
+  categoryId     Int
+  SubCategory    SubCategory @relation(fields: [subCategoryId], references: [id])
+  subCategoryId  Int
+  User           User        @relation(fields: [userId], references: [id])
+  userId         Int
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @default(now())
+}
+
+model Category {
+  id          Int           @id @default(autoincrement())
+  name        String        @unique
+  SubCategory SubCategory[]
+  Trends      Trend[]
+  User        User          @relation(fields: [userId], references: [id])
+  userId      Int
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @default(now())
+}
+
+model SubCategory {
+  id         Int      @id @default(autoincrement())
+  name       String   @unique
+  Graph      Graph[]
+  Trends     Trend[]
+  Category   Category @relation(fields: [categoryId], references: [id])
+  categoryId Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now())
+}
+
+enum Role {
+  ADMIN
+  USER
+}

@@ -1,0 +1,30 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 18
+    commands:
+      - curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+      - export NVM_DIR="$HOME/.nvm"
+      - '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"'
+      - nvm install 18.20.2
+      - echo installed node 18.20.2
+      - nvm use 18.20.2 
+      - echo using node 18.20.2
+    
+      - echo Installing source dependencies...
+      - yarn install
+
+  pre_build:
+    commands:
+      - echo Migrating the database...
+      - yarn db:migrate  # Assuming you have a script in your package.json that runs your migrations
+      
+  post_build:
+    commands:
+      - echo Build completed on `date`
+
+artifacts:
+  files:
+    - '**/*'
